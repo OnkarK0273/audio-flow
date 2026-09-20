@@ -1,27 +1,40 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { VoiceInputBox } from "@/components/voice/VoiceInputBox";
 import { SettingsDialog } from "@/components/voice/SettingsDialog";
 import { TranscriptionHistory } from "@/components/voice/TranscriptionHistory";
+import { TtsTool } from "@/components/tts/TtsTool";
 import { useTranscribeStore } from "@/store/useTranscribeStore";
+import { useTtsStore } from "@/store/useTtsStore";
 import { Button } from "@/components/ui/button";
 import {
   Activity,
   Cpu,
+  Download,
   Headphones,
   Mic,
+  Music,
   Radio,
   SlidersHorizontal,
   Sparkles,
+  Volume2,
+  Wand2,
   Zap,
 } from "lucide-react";
 
 export default function Home() {
-  const { setIsSettingsOpen, selectedModel, setInputValue } =
-    useTranscribeStore();
+  const [activeTab, setActiveTab] = useState<"stt" | "tts">("stt");
 
-  const samplePrompts = [
+  const {
+    setIsSettingsOpen,
+    selectedModel: sttModel,
+    setInputValue,
+  } = useTranscribeStore();
+
+  const { selectedModel: ttsModel } = useTtsStore();
+
+  const sampleSttPrompts = [
     "Draft a quick summary of the product roadmap review meeting",
     "Send an update to the engineering team about the WebSocket integration",
     "List three key advantages of real-time streaming audio transcription",
@@ -43,17 +56,21 @@ export default function Home() {
           <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
             {/* Logo */}
             <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center h-9 w-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 shadow-md shadow-blue-500/20 text-white">
-                <Mic className="h-5 w-5" />
+              <div className="flex items-center justify-center h-9 w-9 rounded-xl bg-gradient-to-tr from-blue-600 to-purple-600 shadow-md shadow-blue-500/20 text-white">
+                {activeTab === "stt" ? (
+                  <Mic className="h-5 w-5" />
+                ) : (
+                  <Volume2 className="h-5 w-5" />
+                )}
               </div>
               <div>
                 <div className="flex items-center gap-2">
                   <span className="font-bold text-base tracking-tight text-white">
-                    AudioScribe
+                    Voise Transcribe & Speech
                   </span>
                   <span className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    Live API
+                    Gemini AI
                   </span>
                 </div>
               </div>
@@ -64,7 +81,7 @@ export default function Home() {
               <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full border border-neutral-800 bg-neutral-900/60 text-xs text-neutral-300">
                 <Cpu className="h-3.5 w-3.5 text-blue-400" />
                 <span className="font-mono text-[11px] text-neutral-200">
-                  {selectedModel}
+                  {activeTab === "stt" ? sttModel : ttsModel}
                 </span>
               </div>
 
@@ -82,102 +99,204 @@ export default function Home() {
         </header>
 
         {/* Main Content Area */}
-        <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-10 space-y-12">
+        <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-8 space-y-10">
           {/* Hero Section */}
-          <div className="text-center space-y-3 pt-4">
+          <div className="text-center space-y-3 pt-2">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-blue-500/30 bg-blue-500/10 text-blue-400 text-xs font-medium backdrop-blur-md shadow-sm">
               <Sparkles className="h-3.5 w-3.5" />
-              Next-Gen Speech-to-Text Input Experience
+              {activeTab === "stt"
+                ? "Live Speech-to-Text with Gemini Transcribe"
+                : "Natural Speech Synthesis with Gemini TTS"}
             </div>
+
             <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white max-w-2xl mx-auto leading-tight">
-              Real-time Voice Dictation in Your{" "}
-              <span className="bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-400 bg-clip-text text-transparent">
-                Input Box
-              </span>
+              {activeTab === "stt" ? (
+                <>
+                  Real-time Voice Dictation in Your{" "}
+                  <span className="bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-400 bg-clip-text text-transparent">
+                    Input Box
+                  </span>
+                </>
+              ) : (
+                <>
+                  Transform Text into Natural{" "}
+                  <span className="bg-gradient-to-r from-purple-400 via-pink-300 to-indigo-400 bg-clip-text text-transparent">
+                    Human Speech
+                  </span>
+                </>
+              )}
             </h1>
+
             <p className="text-sm sm:text-base text-neutral-400 max-w-xl mx-auto leading-relaxed">
-              Tap the microphone to convert speech to text dynamically as you
-              talk, powered by Gemini Live WebSocket streaming and AudioWorklet.
+              {activeTab === "stt"
+                ? "Tap the microphone to convert voice to text dynamically as you talk, powered by Gemini Live WebSocket streaming."
+                : "Generate expressive audio with natural cadence, prebuilt voices, and emotional tags. Play and download standard WAV audio."}
             </p>
           </div>
 
-          {/* Core Voice Input Box */}
-          <div className="space-y-4">
-            <VoiceInputBox />
+          {/* Primary Tool Tab Selector */}
+          <div className="flex items-center justify-center">
+            <div className="inline-flex p-1.5 rounded-2xl bg-neutral-900/90 border border-neutral-800/90 backdrop-blur-xl shadow-xl">
+              <button
+                type="button"
+                onClick={() => setActiveTab("stt")}
+                className={`flex items-center gap-2 px-5 py-2 rounded-xl font-medium text-sm transition-all duration-200 cursor-pointer ${
+                  activeTab === "stt"
+                    ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/25"
+                    : "text-neutral-400 hover:text-white"
+                }`}
+              >
+                <Mic className="h-4 w-4" />
+                <span>Voice to Text (STT)</span>
+              </button>
 
-            {/* Sample Prompts */}
-            <div className="max-w-3xl mx-auto flex items-center gap-2 flex-wrap text-xs text-neutral-400">
-              <span className="text-neutral-400 font-medium">
-                Try speaking:
-              </span>
-              {samplePrompts.map((prompt, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setInputValue(prompt)}
-                  className="px-2.5 py-1 rounded-lg border border-neutral-800/80 bg-neutral-900/40 hover:bg-neutral-800 hover:text-neutral-200 text-neutral-300 transition-all text-left"
-                >
-                  &ldquo;{prompt}&rdquo;
-                </button>
-              ))}
+              <button
+                type="button"
+                onClick={() => setActiveTab("tts")}
+                className={`flex items-center gap-2 px-5 py-2 rounded-xl font-medium text-sm transition-all duration-200 cursor-pointer ${
+                  activeTab === "tts"
+                    ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-purple-500/25"
+                    : "text-neutral-400 hover:text-white"
+                }`}
+              >
+                <Volume2 className="h-4 w-4" />
+                <span>Text to Speech (TTS)</span>
+              </button>
             </div>
           </div>
 
-          {/* Features Highlights Grid */}
-          {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 max-w-3xl mx-auto">
-            <div className="p-4 rounded-2xl border border-neutral-800/80 bg-neutral-900/30 backdrop-blur-sm space-y-1.5">
-              <div className="flex items-center gap-2 text-blue-400">
-                <Radio className="h-4 w-4" />
-                <h4 className="text-xs font-semibold uppercase tracking-wider">
-                  Live Audio Streaming
-                </h4>
-              </div>
-              <p className="text-xs text-neutral-400">
-                Raw 16kHz mono PCM frames streaming via AudioWorklet for low latency.
-              </p>
-            </div>
+          {/* Tab 1: Voice to Text (STT) */}
+          {activeTab === "stt" && (
+            <div className="space-y-10 animate-in fade-in-0 duration-200">
+              <div className="space-y-4">
+                <VoiceInputBox />
 
-            <div className="p-4 rounded-2xl border border-neutral-800/80 bg-neutral-900/30 backdrop-blur-sm space-y-1.5">
-              <div className="flex items-center gap-2 text-indigo-400">
-                <Zap className="h-4 w-4" />
-                <h4 className="text-xs font-semibold uppercase tracking-wider">
-                  Gemini 3.5 Transcribe
-                </h4>
+                {/* Sample STT Prompts */}
+                <div className="max-w-3xl mx-auto flex items-center gap-2 flex-wrap text-xs text-neutral-400">
+                  <span className="text-neutral-400 font-medium">
+                    Try speaking:
+                  </span>
+                  {sampleSttPrompts.map((prompt, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setInputValue(prompt)}
+                      className="px-2.5 py-1 rounded-lg border border-neutral-800/80 bg-neutral-900/40 hover:bg-neutral-800 hover:text-neutral-200 text-neutral-300 transition-all text-left"
+                    >
+                      &ldquo;{prompt}&rdquo;
+                    </button>
+                  ))}
+                </div>
               </div>
-              <p className="text-xs text-neutral-400">
-                Uses Google&apos;s speech recognition model with smart disfluency removal.
-              </p>
-            </div>
 
-            <div className="p-4 rounded-2xl border border-neutral-800/80 bg-neutral-900/30 backdrop-blur-sm space-y-1.5">
-              <div className="flex items-center gap-2 text-purple-400">
-                <Activity className="h-4 w-4" />
-                <h4 className="text-xs font-semibold uppercase tracking-wider">
-                  Reactive Waveform
-                </h4>
+              {/* Features Highlights Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
+                <div className="p-4 rounded-2xl border border-neutral-800/80 bg-neutral-900/30 backdrop-blur-sm space-y-1.5">
+                  <div className="flex items-center gap-2 text-blue-400">
+                    <Radio className="h-4 w-4" />
+                    <h4 className="text-xs font-semibold uppercase tracking-wider">
+                      Live Audio Streaming
+                    </h4>
+                  </div>
+                  <p className="text-xs text-neutral-400">
+                    16kHz mono PCM frames streaming via AudioWorklet for low
+                    latency.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl border border-neutral-800/80 bg-neutral-900/30 backdrop-blur-sm space-y-1.5">
+                  <div className="flex items-center gap-2 text-indigo-400">
+                    <Zap className="h-4 w-4" />
+                    <h4 className="text-xs font-semibold uppercase tracking-wider">
+                      Gemini 3.5 Transcribe
+                    </h4>
+                  </div>
+                  <p className="text-xs text-neutral-400">
+                    Google&apos;s speech recognition with smart disfluency
+                    removal.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl border border-neutral-800/80 bg-neutral-900/30 backdrop-blur-sm space-y-1.5">
+                  <div className="flex items-center gap-2 text-purple-400">
+                    <Activity className="h-4 w-4" />
+                    <h4 className="text-xs font-semibold uppercase tracking-wider">
+                      Reactive Waveform
+                    </h4>
+                  </div>
+                  <p className="text-xs text-neutral-400">
+                    Real-time volume audio wave bars mirroring ChatGPT and
+                    Gemini UI.
+                  </p>
+                </div>
               </div>
-              <p className="text-xs text-neutral-400">
-                Real-time RMS volume audio wave bars mirroring ChatGPT and Gemini UI.
-              </p>
-            </div>
-          </div> */}
 
-          {/* Transcription History Section */}
-          <div className="max-w-3xl mx-auto pt-6 border-t border-neutral-800/80">
-            <TranscriptionHistory />
-          </div>
+              {/* Transcription History Section */}
+              <div className="max-w-3xl mx-auto pt-6 border-t border-neutral-800/80">
+                <TranscriptionHistory />
+              </div>
+            </div>
+          )}
+
+          {/* Tab 2: Text to Speech (TTS) */}
+          {activeTab === "tts" && (
+            <div className="space-y-10 animate-in fade-in-0 duration-200">
+              <TtsTool />
+
+              {/* TTS Feature Highlights */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
+                <div className="p-4 rounded-2xl border border-neutral-800/80 bg-neutral-900/30 backdrop-blur-sm space-y-1.5">
+                  <div className="flex items-center gap-2 text-indigo-400">
+                    <Wand2 className="h-4 w-4" />
+                    <h4 className="text-xs font-semibold uppercase tracking-wider">
+                      Expressive Style Tags
+                    </h4>
+                  </div>
+                  <p className="text-xs text-neutral-400">
+                    Control emotion and tone with tags like [whispers],
+                    [cheerfully], and [excited].
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl border border-neutral-800/80 bg-neutral-900/30 backdrop-blur-sm space-y-1.5">
+                  <div className="flex items-center gap-2 text-purple-400">
+                    <Volume2 className="h-4 w-4" />
+                    <h4 className="text-xs font-semibold uppercase tracking-wider">
+                      10+ Prebuilt Voices
+                    </h4>
+                  </div>
+                  <p className="text-xs text-neutral-400">
+                    Choose from distinct vocal personas including Kore, Puck,
+                    Charon, Fenrir, and Aoede.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl border border-neutral-800/80 bg-neutral-900/30 backdrop-blur-sm space-y-1.5">
+                  <div className="flex items-center gap-2 text-pink-400">
+                    <Download className="h-4 w-4" />
+                    <h4 className="text-xs font-semibold uppercase tracking-wider">
+                      Play & Download WAV
+                    </h4>
+                  </div>
+                  <p className="text-xs text-neutral-400">
+                    Built-in interactive audio player with instant one-click
+                    standard .wav download.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </main>
 
         {/* Footer */}
         <footer className="border-t border-neutral-800/80 py-6 text-center text-xs text-neutral-400">
           <p>
-            Built with Next.js App Router, @google/genai Live API, Zustand, and
-            Shadcn UI.
+            Voise: Voice-to-Text & Text-to-Speech powered by Google Gemini Models.
           </p>
         </footer>
       </div>
 
       {/* Global Settings Dialog */}
-      <SettingsDialog />
+      <SettingsDialog activeTool={activeTab} />
     </div>
   );
 }

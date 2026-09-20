@@ -12,6 +12,102 @@ export const AVAILABLE_MODELS: ModelOption[] = [
   },
 ];
 
+// Text-to-Speech (TTS) Models
+export const DEFAULT_TTS_MODEL = "gemini-3.1-flash-tts-preview";
+
+export const AVAILABLE_TTS_MODELS: ModelOption[] = [
+  {
+    id: "gemini-3.1-flash-tts-preview",
+    name: "Gemini 3.1 Flash TTS",
+    description:
+      "Latest advanced speech generation model with expressive styling tags & natural tone",
+    recommended: true,
+  },
+  {
+    id: "gemini-2.5-flash-preview-tts",
+    name: "Gemini 2.5 Flash TTS",
+    description: "High-efficiency, low-latency speech synthesis engine",
+  },
+  {
+    id: "gemini-2.5-pro-preview-tts",
+    name: "Gemini 2.5 Pro TTS",
+    description:
+      "High-fidelity audio synthesis designed for long-form and expressive narratives",
+  },
+];
+
+export interface TtsVoiceOption {
+  id: string;
+  name: string;
+  gender: "Female" | "Male" | "Neutral";
+  description: string;
+}
+
+export const DEFAULT_TTS_VOICE = "Kore";
+
+export const AVAILABLE_TTS_VOICES: TtsVoiceOption[] = [
+  {
+    id: "Kore",
+    name: "Kore",
+    gender: "Female",
+    description: "Firm, clear, professional tone",
+  },
+  {
+    id: "Puck",
+    name: "Puck",
+    gender: "Male",
+    description: "Upbeat, lively, energetic delivery",
+  },
+  {
+    id: "Charon",
+    name: "Charon",
+    gender: "Male",
+    description: "Informative, deep, calm narration",
+  },
+  {
+    id: "Aoede",
+    name: "Aoede",
+    gender: "Female",
+    description: "Confident, articulate, expressive",
+  },
+  {
+    id: "Fenrir",
+    name: "Fenrir",
+    gender: "Male",
+    description: "Excitable, punchy, dynamic",
+  },
+  {
+    id: "Zephyr",
+    name: "Zephyr",
+    gender: "Neutral",
+    description: "Smooth, gentle, soothing",
+  },
+  {
+    id: "Leda",
+    name: "Leda",
+    gender: "Female",
+    description: "Warm, conversational, approachable",
+  },
+  {
+    id: "Orus",
+    name: "Orus",
+    gender: "Male",
+    description: "Crisp, authoritative broadcast style",
+  },
+  {
+    id: "Enceladus",
+    name: "Enceladus",
+    gender: "Male",
+    description: "Resonant, story-teller voice",
+  },
+  {
+    id: "Despina",
+    name: "Despina",
+    gender: "Female",
+    description: "Friendly, casual, modern",
+  },
+];
+
 export const AVAILABLE_LANGUAGES: LanguageOption[] = [
   {
     id: "auto",
