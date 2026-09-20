@@ -18,7 +18,8 @@ import {
 } from "lucide-react";
 
 export default function Home() {
-  const { setIsSettingsOpen, selectedModel, setInputValue } = useTranscribeStore();
+  const { setIsSettingsOpen, selectedModel, setInputValue } =
+    useTranscribeStore();
 
   const samplePrompts = [
     "Draft a quick summary of the product roadmap review meeting",
@@ -48,7 +49,7 @@ export default function Home() {
               <div>
                 <div className="flex items-center gap-2">
                   <span className="font-bold text-base tracking-tight text-white">
-                    Voise Transcribe
+                    AudioScribe
                   </span>
                   <span className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
@@ -95,8 +96,8 @@ export default function Home() {
               </span>
             </h1>
             <p className="text-sm sm:text-base text-neutral-400 max-w-xl mx-auto leading-relaxed">
-              Tap the microphone to convert speech to text dynamically as you talk,
-              powered by Gemini Live WebSocket streaming and AudioWorklet.
+              Tap the microphone to convert speech to text dynamically as you
+              talk, powered by Gemini Live WebSocket streaming and AudioWorklet.
             </p>
           </div>
 
@@ -106,7 +107,9 @@ export default function Home() {
 
             {/* Sample Prompts */}
             <div className="max-w-3xl mx-auto flex items-center gap-2 flex-wrap text-xs text-neutral-400">
-              <span className="text-neutral-400 font-medium">Try speaking:</span>
+              <span className="text-neutral-400 font-medium">
+                Try speaking:
+              </span>
               {samplePrompts.map((prompt, idx) => (
                 <button
                   key={idx}
@@ -120,7 +123,7 @@ export default function Home() {
           </div>
 
           {/* Features Highlights Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 max-w-3xl mx-auto">
+          {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 max-w-3xl mx-auto">
             <div className="p-4 rounded-2xl border border-neutral-800/80 bg-neutral-900/30 backdrop-blur-sm space-y-1.5">
               <div className="flex items-center gap-2 text-blue-400">
                 <Radio className="h-4 w-4" />
@@ -156,7 +159,7 @@ export default function Home() {
                 Real-time RMS volume audio wave bars mirroring ChatGPT and Gemini UI.
               </p>
             </div>
-          </div>
+          </div> */}
 
           {/* Transcription History Section */}
           <div className="max-w-3xl mx-auto pt-6 border-t border-neutral-800/80">
@@ -167,7 +170,8 @@ export default function Home() {
         {/* Footer */}
         <footer className="border-t border-neutral-800/80 py-6 text-center text-xs text-neutral-400">
           <p>
-            Built with Next.js App Router, @google/genai Live API, Zustand, and Shadcn UI.
+            Built with Next.js App Router, @google/genai Live API, Zustand, and
+            Shadcn UI.
           </p>
         </footer>
       </div>

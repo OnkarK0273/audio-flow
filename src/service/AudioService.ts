@@ -1,5 +1,5 @@
 import { calculateAudioLevel, createPCMBlob } from "@/lib/audioUtils";
-import { INPUT_SAMPLE_RATE } from "@/lib/constants";
+import { DEFAULT_MODEL, INPUT_SAMPLE_RATE } from "@/lib/constants";
 import {
   AgentState,
   ConnectConfig,
@@ -12,9 +12,6 @@ import {
   Modality,
   Session,
 } from "@google/genai";
-
-// gemini-2.5-flash supports Live API bidiGenerateContent
-const LIVE_MODEL = "gemini-3.5-transcribe-live";
 
 export class AudioService {
   private ai: GoogleGenAI;
@@ -48,7 +45,7 @@ export class AudioService {
       const targetModel =
         connectConfig.model && !connectConfig.model.includes("transcribe")
           ? connectConfig.model
-          : LIVE_MODEL;
+          : DEFAULT_MODEL;
 
       const transcriptionConfig: Record<string, any> = {
         mode: connectConfig.mode || "SMART",
