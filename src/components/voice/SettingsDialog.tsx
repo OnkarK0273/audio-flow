@@ -147,7 +147,6 @@ export function SettingsDialog({ activeTool = "stt" }: SettingsDialogProps) {
               >
                 Google AI Studio
               </a>
-              , or specify <code className="text-neutral-300">GEMINI_API_KEY</code> in <code className="text-neutral-300">.env</code>.
             </p>
           </div>
 
@@ -243,7 +242,11 @@ export function SettingsDialog({ activeTool = "stt" }: SettingsDialogProps) {
                     className="w-full h-10 px-3 text-sm rounded-lg border border-neutral-800 bg-neutral-900 text-neutral-100 focus:border-blue-500 focus:outline-none transition-colors cursor-pointer"
                   >
                     {AVAILABLE_LANGUAGES.map((lang) => (
-                      <option key={lang.id} value={lang.code} className="bg-neutral-900">
+                      <option
+                        key={lang.id}
+                        value={lang.code}
+                        className="bg-neutral-900"
+                      >
                         {lang.flag} {lang.name} ({lang.region})
                       </option>
                     ))}
@@ -256,27 +259,29 @@ export function SettingsDialog({ activeTool = "stt" }: SettingsDialogProps) {
                     Formatting Mode
                   </label>
                   <div className="grid grid-cols-2 gap-2">
-                    {(["SMART", "VERBATIM"] as TranscriptionMode[]).map((mode) => (
-                      <button
-                        key={mode}
-                        type="button"
-                        onClick={() => setTranscriptionMode(mode)}
-                        className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
-                          transcriptionMode === mode
-                            ? "border-blue-500/60 bg-blue-950/20 text-white"
-                            : "border-neutral-800 bg-neutral-900/40 text-neutral-400 hover:text-neutral-200"
-                        }`}
-                      >
-                        <div className="text-xs font-semibold">
-                          {mode === "SMART" ? "Smart Format" : "Verbatim"}
-                        </div>
-                        <div className="text-[11px] text-neutral-400 mt-0.5">
-                          {mode === "SMART"
-                            ? "Removes filler words & auto-corrects"
-                            : "Exact word-for-word transcript"}
-                        </div>
-                      </button>
-                    ))}
+                    {(["SMART", "VERBATIM"] as TranscriptionMode[]).map(
+                      (mode) => (
+                        <button
+                          key={mode}
+                          type="button"
+                          onClick={() => setTranscriptionMode(mode)}
+                          className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                            transcriptionMode === mode
+                              ? "border-blue-500/60 bg-blue-950/20 text-white"
+                              : "border-neutral-800 bg-neutral-900/40 text-neutral-400 hover:text-neutral-200"
+                          }`}
+                        >
+                          <div className="text-xs font-semibold">
+                            {mode === "SMART" ? "Smart Format" : "Verbatim"}
+                          </div>
+                          <div className="text-[11px] text-neutral-400 mt-0.5">
+                            {mode === "SMART"
+                              ? "Removes filler words & auto-corrects"
+                              : "Exact word-for-word transcript"}
+                          </div>
+                        </button>
+                      ),
+                    )}
                   </div>
                 </div>
               </div>
@@ -368,7 +373,11 @@ export function SettingsDialog({ activeTool = "stt" }: SettingsDialogProps) {
                 <div className="p-3 rounded-xl border border-neutral-800/80 bg-neutral-900/30 text-xs text-neutral-400 flex items-start gap-2">
                   <Wand2 className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
                   <p>
-                    Gemini TTS models act as voice performers! You can use emotional style tags like <code className="text-neutral-200">[whispers]</code> or <code className="text-neutral-200">[cheerfully]</code> in your text to guide delivery.
+                    Gemini TTS models act as voice performers! You can use
+                    emotional style tags like{" "}
+                    <code className="text-neutral-200">[whispers]</code> or{" "}
+                    <code className="text-neutral-200">[cheerfully]</code> in
+                    your text to guide delivery.
                   </p>
                 </div>
               </div>
@@ -379,7 +388,9 @@ export function SettingsDialog({ activeTool = "stt" }: SettingsDialogProps) {
         {/* Footer */}
         <div className="flex items-center justify-between p-4 border-t border-neutral-800 shrink-0 bg-neutral-950">
           <span className="text-xs text-neutral-400">
-            {dialogTab === "stt" ? "Configuring Voice to Text" : "Configuring Text to Speech"}
+            {dialogTab === "stt"
+              ? "Configuring Voice to Text"
+              : "Configuring Text to Speech"}
           </span>
           <div className="flex items-center gap-2">
             <Button

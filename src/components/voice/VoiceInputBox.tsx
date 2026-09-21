@@ -87,7 +87,9 @@ export function VoiceInputBox() {
 
   // Find model & language display names
   const currentModelObj = AVAILABLE_MODELS.find((m) => m.id === selectedModel);
-  const currentLangObj = AVAILABLE_LANGUAGES.find((l) => l.code === selectedLanguage);
+  const currentLangObj = AVAILABLE_LANGUAGES.find(
+    (l) => l.code === selectedLanguage,
+  );
 
   // Compute live combined display text
   const displayText = inputValue;
@@ -95,7 +97,8 @@ export function VoiceInputBox() {
     .trim()
     .split(/\s+/)
     .filter(Boolean).length;
-  const charCount = (inputValue + (interimText ? ` ${interimText}` : "")).length;
+  const charCount = (inputValue + (interimText ? ` ${interimText}` : ""))
+    .length;
 
   return (
     <div className="w-full max-w-3xl mx-auto space-y-3">
@@ -137,7 +140,7 @@ export function VoiceInputBox() {
           variant="ghost"
           size="sm"
           onClick={() => setIsSettingsOpen(true)}
-          className="h-7 px-2.5 text-neutral-400 hover:text-white rounded-full"
+          className="h-7 px-2.5 text-neutral-400  hover:text-black rounded-full"
         >
           <SlidersHorizontal className="h-3.5 w-3.5 mr-1.5" />
           Settings
@@ -150,8 +153,8 @@ export function VoiceInputBox() {
           isRecording
             ? "border-red-500/50 shadow-red-500/10 ring-2 ring-red-500/20"
             : isConnecting
-            ? "border-blue-500/50 ring-2 ring-blue-500/20 shadow-blue-500/10"
-            : "border-neutral-800 hover:border-neutral-700/80 focus-within:border-neutral-600 shadow-black/40"
+              ? "border-blue-500/50 ring-2 ring-blue-500/20 shadow-blue-500/10"
+              : "border-neutral-800 hover:border-neutral-700/80 focus-within:border-neutral-600 shadow-black/40"
         }`}
       >
         {/* Textarea for Transcribed & Typed Text */}
@@ -251,13 +254,15 @@ export function VoiceInputBox() {
               type="button"
               onClick={handleVoiceToggle}
               disabled={isConnecting}
-              aria-label={isRecording ? "Stop recording" : "Start voice recording"}
+              aria-label={
+                isRecording ? "Stop recording" : "Start voice recording"
+              }
               className={`relative flex items-center justify-center h-10 px-3.5 rounded-full font-medium text-sm transition-all duration-300 cursor-pointer shadow-lg active:scale-95 ${
                 isRecording
                   ? "bg-red-500 hover:bg-red-600 text-white shadow-red-500/30 ring-4 ring-red-500/20"
                   : isConnecting
-                  ? "bg-blue-600/80 text-white opacity-80 cursor-wait"
-                  : "bg-white hover:bg-neutral-200 text-neutral-900 dark:bg-neutral-100 dark:hover:bg-white dark:text-neutral-950 shadow-white/10"
+                    ? "bg-blue-600/80 text-white opacity-80 cursor-wait"
+                    : "bg-white hover:bg-neutral-200 text-neutral-900 dark:bg-neutral-100 dark:hover:bg-white dark:text-neutral-950 shadow-white/10"
               }`}
             >
               {isRecording ? (

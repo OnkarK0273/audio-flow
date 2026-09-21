@@ -123,7 +123,7 @@ export function TtsTool() {
           variant="ghost"
           size="sm"
           onClick={() => setIsSettingsOpen(true)}
-          className="h-7 px-2.5 text-neutral-400 hover:text-white rounded-full"
+          className="h-7 px-2.5 text-neutral-400 hover:text-black  rounded-full"
         >
           <SlidersHorizontal className="h-3.5 w-3.5 mr-1.5" />
           Settings
