@@ -76,6 +76,10 @@ export function TtsTool() {
 
   const handleGenerate = () => {
     if (!inputText.trim() || isGenerating) return;
+    if (!apiKey) {
+      setIsSettingsOpen(true);
+      return;
+    }
     generateSpeech(apiKey);
   };
 

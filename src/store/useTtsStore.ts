@@ -162,7 +162,8 @@ export const useTtsStore = create<TtsState>((set, get) => ({
     persistAudios(updated);
     set({
       generatedAudios: updated,
-      activePlayingId: get().activePlayingId === id ? null : get().activePlayingId,
+      activePlayingId:
+        get().activePlayingId === id ? null : get().activePlayingId,
     });
   },
 

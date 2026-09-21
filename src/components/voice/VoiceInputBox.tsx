@@ -40,6 +40,7 @@ export function VoiceInputBox() {
     stopRecording,
     cancelRecording,
     setIsSettingsOpen,
+    apiKey,
   } = useTranscribeStore();
 
   const [copied, setCopied] = useState(false);
@@ -61,6 +62,11 @@ export function VoiceInputBox() {
 
   // Handle Voice Button Click (ChatGPT / Gemini style toggle)
   const handleVoiceToggle = () => {
+    if (!apiKey) {
+      setIsSettingsOpen(true);
+      return;
+    }
+
     if (isRecording) {
       stopRecording();
     } else if (!isConnecting) {
