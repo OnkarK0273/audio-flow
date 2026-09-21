@@ -6,6 +6,7 @@ import TabSection from "@/components/common/Tabs";
 import TabBody from "@/components/common/TabBody";
 import Navigation from "@/components/common/Navigation";
 import BgDecorative from "@/components/common/BgDecorative";
+import Footer from "@/components/common/Footer";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<"stt" | "tts">("stt");
@@ -32,19 +33,7 @@ export default function Home() {
         </main>
 
         {/* Footer */}
-        <footer className="border-t border-neutral-800/80 py-6 text-center text-xs text-neutral-400">
-          <p className="mb-1">
-            AudioFlow By
-            <a
-              href="https://www.linkedin.com/in/onkar-k-557a421a4/"
-              target="_blank"
-              className="text-white"
-            >
-              {" "}
-              Onkar.K
-            </a>
-          </p>
-        </footer>
+        <Footer />
       </div>
 
       {/* Global Settings Dialog */}
