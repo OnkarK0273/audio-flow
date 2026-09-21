@@ -17,7 +17,7 @@ export default function Home() {
 
       <div className="relative z-10 flex flex-col min-h-screen">
         {/* Navigation Bar */}
-        <Navigation activeTab={activeTab} />
+        <Navigation />
 
         {/* Main Content Area */}
         <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-8 space-y-10">
@@ -33,9 +33,16 @@ export default function Home() {
 
         {/* Footer */}
         <footer className="border-t border-neutral-800/80 py-6 text-center text-xs text-neutral-400">
-          <p>
-            Voise: Voice-to-Text & Text-to-Speech powered by Google Gemini
-            Models.
+          <p className="mb-1">
+            AudioFlow By
+            <a
+              href="https://www.linkedin.com/in/onkar-k-557a421a4/"
+              target="_blank"
+              className="text-white"
+            >
+              {" "}
+              Onkar.K
+            </a>
           </p>
         </footer>
       </div>
