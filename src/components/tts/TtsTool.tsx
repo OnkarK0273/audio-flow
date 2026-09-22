@@ -1,38 +1,28 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { useTtsStore } from "@/store/useTtsStore";
 import { useTranscribeStore } from "@/store/useTranscribeStore";
 import { AVAILABLE_TTS_MODELS, AVAILABLE_TTS_VOICES } from "@/lib/constants";
-import { AudioPlayerItem } from "./AudioPlayerItem";
 import { Button } from "@/components/ui/button";
 import {
   AlertCircle,
-  Headphones,
   Loader2,
-  Mic,
-  Music,
   SlidersHorizontal,
   Sparkles,
-  Trash2,
   Volume2,
   Wand2,
 } from "lucide-react";
 import VoiseHistory from "./VoiseHistory";
-import { Confetti, ConfettiRef } from "../ui/confetti";
 
 export function TtsTool() {
-  const confettiRef = useRef<ConfettiRef>(null);
   const {
     inputText,
     setInputText,
     selectedModel,
-
     selectedVoice,
-
     isGenerating,
     error,
-
     generateSpeech,
   } = useTtsStore();
 
