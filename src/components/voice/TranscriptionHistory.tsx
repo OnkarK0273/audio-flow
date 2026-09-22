@@ -13,8 +13,13 @@ import {
 } from "lucide-react";
 
 export function TranscriptionHistory() {
-  const { history, deleteHistoryItem, clearHistory, setInputValue, inputValue } =
-    useTranscribeStore();
+  const {
+    history,
+    deleteHistoryItem,
+    clearHistory,
+    setInputValue,
+    inputValue,
+  } = useTranscribeStore();
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const handleCopy = (item: HistoryItem) => {
@@ -51,15 +56,16 @@ export function TranscriptionHistory() {
           No Transcriptions Yet
         </h4>
         <p className="text-xs text-neutral-400 max-w-xs mt-1">
-          Click the microphone button and speak. Your real-time transcription history will appear here.
+          Click the microphone button and speak. Your real-time transcription
+          history will appear here.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between px-1">
+    <div className="space-y-3 scrollbar-thin scrollbar-thumb-neutral-700 scrollbar-track-transparent">
+      <div className="flex items-center justify-between px-1 ">
         <div className="flex items-center gap-2">
           <History className="h-4 w-4 text-neutral-400" />
           <h3 className="text-sm font-semibold text-neutral-200">

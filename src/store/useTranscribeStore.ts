@@ -218,7 +218,7 @@ export const useTranscribeStore = create<TranscribeState>((set, get) => ({
       set({ audioServiceInstance: service });
 
       // 4. Start session
-      console.log("Starting session with model:", state.selectedModel);
+
       await service.startSession({
         model: state.selectedModel,
         languageCode: state.selectedLanguage,

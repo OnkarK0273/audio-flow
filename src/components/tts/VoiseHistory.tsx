@@ -6,7 +6,7 @@ import { AudioPlayerItem } from "./AudioPlayerItem";
 function VoiseHistory() {
   const { generatedAudios, clearAllAudios } = useTtsStore();
   return (
-    <div className="space-y-3 pt-4 border-t border-neutral-800/80">
+    <div className="space-y-3 pt-4 border-t border-neutral-800/80 scrollbar-thin scrollbar-thumb-neutral-700 scrollbar-track-transparent ">
       <div className="flex items-center justify-between px-1">
         <div className="flex items-center gap-2">
           <Headphones className="h-4 w-4 text-neutral-400" />
