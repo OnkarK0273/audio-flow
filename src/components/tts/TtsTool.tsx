@@ -162,7 +162,7 @@ export function TtsTool() {
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
           placeholder="Enter text to synthesize into speech. You can use natural language instructions or emotional tags like [cheerfully] or [whispers] to guide delivery..."
-          className="w-full min-h-[120px] max-h-[260px] resize-y bg-transparent text-base text-neutral-100 placeholder:text-neutral-500 focus:outline-none leading-relaxed"
+          className="w-full min-h-[120px] max-h-[260px] resize-y bg-transparent text-base text-neutral-100 placeholder:text-neutral-500 focus:outline-none leading-relaxed scrollbar-thin scrollbar-thumb-neutral-700 scrollbar-track-transparent"
           rows={4}
         />
 

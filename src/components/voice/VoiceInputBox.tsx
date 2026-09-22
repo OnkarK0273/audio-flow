@@ -174,7 +174,7 @@ export function VoiceInputBox() {
                 ? "Listening... Speak naturally in your microphone..."
                 : "Type here or tap the microphone button to dictate in real-time..."
             }
-            className="w-full resize-none bg-transparent text-base md:text-lg text-neutral-100 placeholder:text-neutral-500 focus:outline-none leading-relaxed transition-all"
+            className="w-full resize-none bg-transparent text-base md:text-lg text-neutral-100 placeholder:text-neutral-500 focus:outline-none leading-relaxed transition-all scrollbar-thin scrollbar-thumb-neutral-700 scrollbar-track-transparent"
             rows={3}
           />
 
