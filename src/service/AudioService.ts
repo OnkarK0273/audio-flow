@@ -162,14 +162,14 @@ export class AudioService {
 
   private handleMessage(message: LiveServerMessage) {
     const serverContent = message.serverContent;
-
+    // inputTranscription
     if (serverContent?.inputTranscription?.text) {
       const delta = serverContent.inputTranscription.text;
       this.currentTranscription += delta;
       this.callbacks.onAgentStateChange(AgentState.TRANSCRIBING);
       this.callbacks.onTranscript("user", this.currentTranscription, true);
     }
-
+    // interimInputTranscription
     if (serverContent?.interimInputTranscription?.text) {
       const interim = serverContent.interimInputTranscription.text;
       this.callbacks.onAgentStateChange(AgentState.TRANSCRIBING);
@@ -179,7 +179,7 @@ export class AudioService {
         true,
       );
     }
-
+    // modelTurn
     if (serverContent?.modelTurn?.parts) {
       for (const part of serverContent.modelTurn.parts) {
         if (part.text && !serverContent.inputTranscription) {
@@ -188,7 +188,7 @@ export class AudioService {
         }
       }
     }
-
+    // turnComplete
     if (serverContent?.turnComplete) {
       if (this.currentTranscription) {
         this.callbacks.onTranscript("user", this.currentTranscription, false);
