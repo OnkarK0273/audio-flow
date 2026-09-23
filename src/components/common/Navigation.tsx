@@ -1,4 +1,4 @@
-import { Cpu, Mic, SlidersHorizontal, Volume2 } from "lucide-react";
+import { SlidersHorizontal } from "lucide-react";
 import { Button } from "../ui/button";
 import { useTranscribeStore } from "@/store/useTranscribeStore";
 import Image from "next/image";
@@ -33,8 +33,26 @@ function Navigation() {
             <SlidersHorizontal className="h-3.5 w-3.5 mr-1.5 text-neutral-400" />
             Config
           </Button>
+          <a href="https://github.com/OnkarK0273/audio-flow" target="_blank">
+            <Image
+              src={"/github-dark.svg"}
+              alt="github"
+              width={20}
+              height={20}
+              className=" md:hidden "
+            />
+          </a>
         </div>
       </div>
+      <a href="https://github.com/OnkarK0273/audio-flow" target="_blank">
+        <Image
+          src={"/github-dark.svg"}
+          alt="github"
+          width={20}
+          height={20}
+          className="hidden md:block absolute right-4 top-5"
+        />
+      </a>
     </header>
   );
 }
