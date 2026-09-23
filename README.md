@@ -1,4 +1,35 @@
-# TTS Diagram Process
+# Voise to Text (STT) Archetecture
+
+```mermaid
+graph TD
+    A[Microphone Capture] -->|navigator.mediaDevices| B(AudioContext / MediaStream)
+    B -->|Raw Float32 Data| C{AudioWorkletProcessor}
+
+    subgraph Client-Side Audio Processing [Background Thread]
+        C -->|Resampling| D[Downsample to 16kHz]
+        D -->|Encoding| E[Convert to 16-bit PCM]
+        E -->|Chunking| F[Slice into 100-250ms Buffers]
+    end
+
+    F -->|postMessage| G[Main React Thread]
+    G -->|Base64 / Binary Prep| H((WebSocket Connection))
+
+    H <-->|Bi-directional Stream| I[Gemini Multimodal Live API]
+
+    subgraph Server-Side AI Inference
+        I -->|Acoustic Processing| J[Generate Text Tokens]
+    end
+
+    J -->|Stream Response| H
+    H -->|Incoming Tokens| K[React State Manager]
+
+    K -->|Real-time Volume| L[Animate AudioWaveform]
+    K -->|Partial Tokens| M[Render Interim Ghost Text]
+    K -->|Final Output| N[Update Textbox & Transcription History]
+
+```
+
+# Text to Speech (TTS) Archetecture
 
 ```mermaid
 graph TD
