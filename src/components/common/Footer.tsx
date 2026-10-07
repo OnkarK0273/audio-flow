@@ -4,7 +4,7 @@ function Footer() {
       <p className="mb-1">
         AudioFlow By
         <a
-          href="https://www.linkedin.com/in/onkar-k-557a421a4/"
+          href="https://linktr.ee/onkar.k"
           target="_blank"
           className="text-white"
         >
