@@ -1,12 +1,23 @@
+"use client";
+
 import { useTtsStore } from "@/store/useTtsStore";
 import { Headphones, Music, Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
 import { AudioPlayerItem } from "./AudioPlayerItem";
+import { sendGAEvent } from "@next/third-parties/google";
 
 function VoiseHistory() {
   const { generatedAudios, clearAllAudios } = useTtsStore();
+
+  const handleClearAll = () => {
+    sendGAEvent("event", "tts_audios_cleared_all", {
+      total_items: generatedAudios.length,
+    });
+    clearAllAudios();
+  };
+
   return (
-    <div className="space-y-3 pt-4 border-t border-neutral-800/80 scrollbar-thin scrollbar-thumb-neutral-700 scrollbar-track-transparent ">
+    <div className="space-y-3 pt-4 border-t border-neutral-800/80 scrollbar-thin scrollbar-thumb-neutral-700 scrollbar-track-transparent">
       <div className="flex items-center justify-between px-1">
         <div className="flex items-center gap-2">
           <Headphones className="h-4 w-4 text-neutral-400" />
@@ -18,7 +29,7 @@ function VoiseHistory() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={clearAllAudios}
+            onClick={handleClearAll}
             className="text-xs text-neutral-400 hover:text-red-400 h-7 px-2"
           >
             <Trash2 className="h-3.5 w-3.5 mr-1" />

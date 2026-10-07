@@ -3,6 +3,7 @@ import { DEFAULT_MODEL } from "@/lib/constants";
 import { AudioService } from "@/service/AudioService";
 import { AgentState, ConnectionState, TranscriptionMode } from "@/types";
 import { create } from "zustand";
+import { sendGAEvent } from "@next/third-parties/google";
 
 export interface HistoryItem {
   id: string;
@@ -184,6 +185,9 @@ export const useTranscribeStore = create<TranscribeState>((set, get) => ({
             set({ agentState });
           },
           onError: (errorMessage) => {
+            sendGAEvent("event", "stt_session_error", {
+              error_message: errorMessage.slice(0, 100),
+            });
             set({
               error: errorMessage,
               connectionState: ConnectionState.ERROR,
@@ -226,6 +230,10 @@ export const useTranscribeStore = create<TranscribeState>((set, get) => ({
       });
     } catch (err: any) {
       console.error("Recording error:", err);
+      sendGAEvent("event", "stt_init_error", {
+        error_name: err?.name || "UnknownError",
+        error_message: (err?.message || "Failed to initialize mic").slice(0, 100),
+      });
       set({
         error:
           err?.name === "NotAllowedError"
@@ -259,6 +267,13 @@ export const useTranscribeStore = create<TranscribeState>((set, get) => ({
 
     // Save to history if we have content
     if (finalInput.trim()) {
+      sendGAEvent("event", "stt_recording_completed", {
+        model: selectedModel,
+        language: selectedLanguage,
+        word_count: finalInput.trim().split(/\s+/).filter(Boolean).length,
+        char_count: finalInput.length,
+      });
+
       const newHistoryItem: HistoryItem = {
         id: window.crypto.randomUUID(),
         text: finalInput.trim(),

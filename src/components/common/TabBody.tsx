@@ -1,7 +1,10 @@
+"use client";
+
 import { useTranscribeStore } from "@/store/useTranscribeStore";
 import { TtsTool } from "../tts/TtsTool";
 import { TranscriptionHistory } from "../voice/TranscriptionHistory";
 import { VoiceInputBox } from "../voice/VoiceInputBox";
+import { sendGAEvent } from "@next/third-parties/google";
 
 function TabBody({ activeTab }: { activeTab: "stt" | "tts" }) {
   const { setInputValue } = useTranscribeStore();
@@ -10,6 +13,15 @@ function TabBody({ activeTab }: { activeTab: "stt" | "tts" }) {
     "Send an update to the engineering team about the WebSocket integration",
     "List three key advantages of real-time streaming audio transcription",
   ];
+
+  const handlePromptClick = (prompt: string, idx: number) => {
+    sendGAEvent("event", "stt_sample_prompt_clicked", {
+      prompt_preview: prompt.slice(0, 80),
+      prompt_index: idx,
+    });
+    setInputValue(prompt);
+  };
+
   return (
     <>
       {/* Tab 1: Voice to Text (STT) */}
@@ -26,8 +38,8 @@ function TabBody({ activeTab }: { activeTab: "stt" | "tts" }) {
               {sampleSttPrompts.map((prompt, idx) => (
                 <button
                   key={idx}
-                  onClick={() => setInputValue(prompt)}
-                  className="px-2.5 py-1 rounded-lg border border-neutral-800/80 bg-neutral-900/40 hover:bg-neutral-800 hover:text-neutral-200 text-neutral-300 transition-all text-left"
+                  onClick={() => handlePromptClick(prompt, idx)}
+                  className="px-2.5 py-1 rounded-lg border border-neutral-800/80 bg-neutral-900/40 hover:bg-neutral-800 hover:text-neutral-200 text-neutral-300 transition-all text-left cursor-pointer"
                 >
                   &ldquo;{prompt}&rdquo;
                 </button>

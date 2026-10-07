@@ -1,6 +1,7 @@
 import { base64PcmToWavBlob } from "@/lib/audioUtils";
 import { DEFAULT_TTS_MODEL, DEFAULT_TTS_VOICE } from "@/lib/constants";
 import { create } from "zustand";
+import { sendGAEvent } from "@next/third-parties/google";
 
 export interface GeneratedAudioItem {
   id: string;
@@ -97,6 +98,8 @@ export const useTtsStore = create<TtsState>((set, get) => ({
 
     if (!inputText.trim() || isGenerating) return;
 
+    const trimmedText = inputText.trim();
+    const startTime = Date.now();
     set({ isGenerating: true, error: null });
 
     try {
@@ -104,7 +107,7 @@ export const useTtsStore = create<TtsState>((set, get) => ({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          text: inputText.trim(),
+          text: trimmedText,
           model: selectedModel,
           voiceName: selectedVoice,
           clientApiKey: clientApiKey || undefined,
@@ -117,13 +120,23 @@ export const useTtsStore = create<TtsState>((set, get) => ({
         throw new Error(data.error || "Failed to generate speech");
       }
 
+      const latencyMs = Date.now() - startTime;
       const sampleRate = data.sampleRate || 24000;
       const wavBlob = base64PcmToWavBlob(data.audioBase64, sampleRate);
       const audioUrl = URL.createObjectURL(wavBlob);
 
+      sendGAEvent("event", "tts_generation_completed", {
+        model: selectedModel,
+        voice: selectedVoice,
+        latency_ms: latencyMs,
+        sample_rate: sampleRate,
+        char_count: trimmedText.length,
+        word_count: trimmedText.split(/\s+/).filter(Boolean).length,
+      });
+
       const newItem: GeneratedAudioItem = {
         id: window.crypto.randomUUID(),
-        text: inputText.trim(),
+        text: trimmedText,
         audioUrl,
         base64Pcm: data.audioBase64,
         sampleRate,
@@ -143,6 +156,11 @@ export const useTtsStore = create<TtsState>((set, get) => ({
       });
     } catch (err: any) {
       console.error("TTS generation error:", err);
+      sendGAEvent("event", "tts_generation_failed", {
+        model: selectedModel,
+        voice: selectedVoice,
+        error_message: (err?.message || "Failed to generate speech audio.").slice(0, 100),
+      });
       set({
         error: err?.message || "Failed to generate speech audio.",
         isGenerating: false,

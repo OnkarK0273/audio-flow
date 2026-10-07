@@ -2,31 +2,28 @@
 
 import React, { useRef, useEffect, useState } from "react";
 import { useTranscribeStore } from "@/store/useTranscribeStore";
-import { ConnectionState, AgentState } from "@/types";
+import { ConnectionState } from "@/types";
 import { AVAILABLE_LANGUAGES, AVAILABLE_MODELS } from "@/lib/constants";
 import { AudioWaveform } from "./AudioWaveform";
 import { Button } from "@/components/ui/button";
+import { sendGAEvent } from "@next/third-parties/google";
 import {
   AlertCircle,
-  ArrowUp,
   Check,
   Copy,
   Languages,
   Loader2,
   Mic,
-  MicOff,
   SlidersHorizontal,
   Sparkles,
   Square,
   Trash2,
-  Volume2,
   X,
 } from "lucide-react";
 
 export function VoiceInputBox() {
   const {
     connectionState,
-    agentState,
     audioLevel,
     error,
     inputValue,
@@ -63,13 +60,27 @@ export function VoiceInputBox() {
   // Handle Voice Button Click (ChatGPT / Gemini style toggle)
   const handleVoiceToggle = () => {
     if (!apiKey) {
+      sendGAEvent("event", "stt_dictate_blocked_no_api_key", {
+        trigger: "dictate_button",
+      });
       setIsSettingsOpen(true);
       return;
     }
 
     if (isRecording) {
+      sendGAEvent("event", "stt_stop_recording_clicked", {
+        model: selectedModel,
+        language: selectedLanguage,
+        word_count: wordCount,
+        char_count: charCount,
+      });
       stopRecording();
     } else if (!isConnecting) {
+      sendGAEvent("event", "stt_start_recording_clicked", {
+        model: selectedModel,
+        language: selectedLanguage,
+        mode: transcriptionMode,
+      });
       startRecording();
     }
   };
@@ -79,16 +90,31 @@ export function VoiceInputBox() {
     if (!textToCopy.trim()) return;
     navigator.clipboard.writeText(textToCopy.trim());
     setCopied(true);
+    sendGAEvent("event", "stt_text_copied", {
+      word_count: wordCount,
+      char_count: charCount,
+    });
     setTimeout(() => setCopied(false), 1500);
   };
 
-  const handleSend = () => {
-    if (isRecording) {
-      stopRecording();
-    } else if (inputValue.trim()) {
-      // Formally triggers stop / save to history
-      stopRecording();
-    }
+  const handleClear = () => {
+    sendGAEvent("event", "stt_text_cleared", {
+      previous_word_count: wordCount,
+      previous_char_count: charCount,
+    });
+    clearInput();
+  };
+
+  const handleCancelRecording = () => {
+    sendGAEvent("event", "stt_recording_cancelled", {
+      had_interim: !!interimText,
+    });
+    cancelRecording();
+  };
+
+  const handleOpenSettings = (trigger: string) => {
+    sendGAEvent("event", "settings_opened", { trigger });
+    setIsSettingsOpen(true);
   };
 
   // Find model & language display names
@@ -113,7 +139,7 @@ export function VoiceInputBox() {
         <div className="flex items-center gap-1.5 flex-wrap">
           {/* Model Badge */}
           <button
-            onClick={() => setIsSettingsOpen(true)}
+            onClick={() => handleOpenSettings("stt_model_badge")}
             className="group flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-neutral-800 bg-neutral-900/60 hover:border-neutral-700 text-neutral-300 transition-all cursor-pointer"
             title="Click to switch model"
           >
@@ -125,7 +151,7 @@ export function VoiceInputBox() {
 
           {/* Language Badge */}
           <button
-            onClick={() => setIsSettingsOpen(true)}
+            onClick={() => handleOpenSettings("stt_language_badge")}
             className="flex items-center gap-1 px-2.5 py-1 rounded-full border border-neutral-800 bg-neutral-900/60 hover:border-neutral-700 text-neutral-300 transition-all cursor-pointer"
             title="Click to switch language"
           >
@@ -145,8 +171,8 @@ export function VoiceInputBox() {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => setIsSettingsOpen(true)}
-          className="h-7 px-2.5 text-neutral-400  hover:text-black rounded-full"
+          onClick={() => handleOpenSettings("stt_settings_button")}
+          className="h-7 px-2.5 text-neutral-400 hover:text-black rounded-full"
         >
           <SlidersHorizontal className="h-3.5 w-3.5 mr-1.5" />
           Settings
@@ -208,7 +234,7 @@ export function VoiceInputBox() {
                 <Button
                   variant="ghost"
                   size="icon-sm"
-                  onClick={cancelRecording}
+                  onClick={handleCancelRecording}
                   title="Cancel and discard voice input"
                   className="h-7 w-7 text-neutral-400 hover:text-red-400 hover:bg-neutral-800 rounded-full"
                 >
@@ -247,7 +273,7 @@ export function VoiceInputBox() {
               <Button
                 variant="ghost"
                 size="icon-sm"
-                onClick={clearInput}
+                onClick={handleClear}
                 title="Clear input"
                 className="h-8 w-8 text-neutral-400 hover:text-red-400 rounded-full"
               >
@@ -303,7 +329,7 @@ export function VoiceInputBox() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setIsSettingsOpen(true)}
+            onClick={() => handleOpenSettings("stt_error_banner")}
             className="h-6 px-2 text-xs text-red-300 hover:text-white hover:bg-red-900/40 ml-2"
           >
             Open Settings

@@ -11,6 +11,7 @@ import {
 } from "@/lib/constants";
 import { TranscriptionMode } from "@/types";
 import { Button } from "@/components/ui/button";
+import { sendGAEvent } from "@next/third-parties/google";
 import {
   Check,
   Eye,
@@ -66,13 +67,68 @@ export function SettingsDialog({ activeTool = "stt" }: SettingsDialogProps) {
 
   if (!isSettingsOpen) return null;
 
+  const handleTabChange = (tab: "stt" | "tts") => {
+    sendGAEvent("event", "settings_tab_switched", {
+      from_tab: dialogTab,
+      to_tab: tab,
+    });
+    setDialogTab(tab);
+  };
+
+  const handleToggleKeyVisibility = () => {
+    sendGAEvent("event", "api_key_visibility_toggled", {
+      now_visible: !showKey,
+    });
+    setShowKey(!showKey);
+  };
+
+  const handleSelectSttModel = (modelId: string) => {
+    sendGAEvent("event", "stt_model_selected", { model: modelId });
+    setSttModel(modelId);
+  };
+
+  const handleSelectSttLanguage = (code: string) => {
+    sendGAEvent("event", "stt_language_selected", { language: code });
+    setSelectedLanguage(code);
+  };
+
+  const handleSelectSttMode = (mode: TranscriptionMode) => {
+    sendGAEvent("event", "stt_mode_selected", { mode });
+    setTranscriptionMode(mode);
+  };
+
+  const handleSelectTtsModel = (modelId: string) => {
+    sendGAEvent("event", "tts_model_selected", { model: modelId });
+    setTtsModel(modelId);
+  };
+
+  const handleSelectTtsVoice = (voiceId: string) => {
+    sendGAEvent("event", "tts_voice_selected", { voice: voiceId });
+    setSelectedVoice(voiceId);
+  };
+
   const handleSave = () => {
+    sendGAEvent("event", "settings_saved", {
+      has_api_key: !!tempKey.trim(),
+      stt_model: sttModel,
+      stt_language: selectedLanguage,
+      stt_mode: transcriptionMode,
+      tts_model: ttsModel,
+      tts_voice: selectedVoice,
+    });
     setApiKey(tempKey.trim());
     setSavedSuccess(true);
     setTimeout(() => {
       setSavedSuccess(false);
       setIsSettingsOpen(false);
     }, 600);
+  };
+
+  const handleClose = () => {
+    sendGAEvent("event", "settings_closed", {
+      saved: false,
+    });
+    setIsSettingsOpen(false);
   };
 
   return (
@@ -97,7 +153,7 @@ export function SettingsDialog({ activeTool = "stt" }: SettingsDialogProps) {
             </div>
           </div>
           <button
-            onClick={() => setIsSettingsOpen(false)}
+            onClick={handleClose}
             className="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors cursor-pointer"
           >
             <X className="h-5 w-5" />
@@ -127,7 +183,7 @@ export function SettingsDialog({ activeTool = "stt" }: SettingsDialogProps) {
               />
               <button
                 type="button"
-                onClick={() => setShowKey(!showKey)}
+                onClick={handleToggleKeyVisibility}
                 className="absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-white cursor-pointer"
               >
                 {showKey ? (
@@ -147,6 +203,7 @@ export function SettingsDialog({ activeTool = "stt" }: SettingsDialogProps) {
               >
                 Google AI Studio
               </a>
+              , or specify <code className="text-neutral-300">GEMINI_API_KEY</code> in <code className="text-neutral-300">.env</code>.
             </p>
           </div>
 
@@ -156,7 +213,7 @@ export function SettingsDialog({ activeTool = "stt" }: SettingsDialogProps) {
               <div className="flex items-center gap-1 p-1 rounded-xl bg-neutral-900 border border-neutral-800 text-xs">
                 <button
                   type="button"
-                  onClick={() => setDialogTab("stt")}
+                  onClick={() => handleTabChange("stt")}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all cursor-pointer ${
                     dialogTab === "stt"
                       ? "bg-blue-600 text-white shadow-sm"
@@ -168,7 +225,7 @@ export function SettingsDialog({ activeTool = "stt" }: SettingsDialogProps) {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setDialogTab("tts")}
+                  onClick={() => handleTabChange("tts")}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all cursor-pointer ${
                     dialogTab === "tts"
                       ? "bg-purple-600 text-white shadow-sm"
@@ -199,7 +256,7 @@ export function SettingsDialog({ activeTool = "stt" }: SettingsDialogProps) {
                       return (
                         <div
                           key={model.id}
-                          onClick={() => setSttModel(model.id)}
+                          onClick={() => handleSelectSttModel(model.id)}
                           className={`cursor-pointer p-3 rounded-xl border transition-all ${
                             isSelected
                               ? "border-blue-500/60 bg-blue-950/20 shadow-sm shadow-blue-500/10"
@@ -238,15 +295,11 @@ export function SettingsDialog({ activeTool = "stt" }: SettingsDialogProps) {
                   </label>
                   <select
                     value={selectedLanguage}
-                    onChange={(e) => setSelectedLanguage(e.target.value)}
+                    onChange={(e) => handleSelectSttLanguage(e.target.value)}
                     className="w-full h-10 px-3 text-sm rounded-lg border border-neutral-800 bg-neutral-900 text-neutral-100 focus:border-blue-500 focus:outline-none transition-colors cursor-pointer"
                   >
                     {AVAILABLE_LANGUAGES.map((lang) => (
-                      <option
-                        key={lang.id}
-                        value={lang.code}
-                        className="bg-neutral-900"
-                      >
+                      <option key={lang.id} value={lang.code} className="bg-neutral-900">
                         {lang.flag} {lang.name} ({lang.region})
                       </option>
                     ))}
@@ -259,29 +312,27 @@ export function SettingsDialog({ activeTool = "stt" }: SettingsDialogProps) {
                     Formatting Mode
                   </label>
                   <div className="grid grid-cols-2 gap-2">
-                    {(["SMART", "VERBATIM"] as TranscriptionMode[]).map(
-                      (mode) => (
-                        <button
-                          key={mode}
-                          type="button"
-                          onClick={() => setTranscriptionMode(mode)}
-                          className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
-                            transcriptionMode === mode
-                              ? "border-blue-500/60 bg-blue-950/20 text-white"
-                              : "border-neutral-800 bg-neutral-900/40 text-neutral-400 hover:text-neutral-200"
-                          }`}
-                        >
-                          <div className="text-xs font-semibold">
-                            {mode === "SMART" ? "Smart Format" : "Verbatim"}
-                          </div>
-                          <div className="text-[11px] text-neutral-400 mt-0.5">
-                            {mode === "SMART"
-                              ? "Removes filler words & auto-corrects"
-                              : "Exact word-for-word transcript"}
-                          </div>
-                        </button>
-                      ),
-                    )}
+                    {(["SMART", "VERBATIM"] as TranscriptionMode[]).map((mode) => (
+                      <button
+                        key={mode}
+                        type="button"
+                        onClick={() => handleSelectSttMode(mode)}
+                        className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                          transcriptionMode === mode
+                            ? "border-blue-500/60 bg-blue-950/20 text-white"
+                            : "border-neutral-800 bg-neutral-900/40 text-neutral-400 hover:text-neutral-200"
+                        }`}
+                      >
+                        <div className="text-xs font-semibold">
+                          {mode === "SMART" ? "Smart Format" : "Verbatim"}
+                        </div>
+                        <div className="text-[11px] text-neutral-400 mt-0.5">
+                          {mode === "SMART"
+                            ? "Removes filler words & auto-corrects"
+                            : "Exact word-for-word transcript"}
+                        </div>
+                      </button>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -302,7 +353,7 @@ export function SettingsDialog({ activeTool = "stt" }: SettingsDialogProps) {
                       return (
                         <div
                           key={model.id}
-                          onClick={() => setTtsModel(model.id)}
+                          onClick={() => handleSelectTtsModel(model.id)}
                           className={`cursor-pointer p-3 rounded-xl border transition-all ${
                             isSelected
                               ? "border-purple-500/60 bg-purple-950/20 shadow-sm shadow-purple-500/10"
@@ -346,7 +397,7 @@ export function SettingsDialog({ activeTool = "stt" }: SettingsDialogProps) {
                         <button
                           key={voice.id}
                           type="button"
-                          onClick={() => setSelectedVoice(voice.id)}
+                          onClick={() => handleSelectTtsVoice(voice.id)}
                           className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
                             isSelected
                               ? "border-purple-500/70 bg-purple-950/30 text-white shadow-sm"
@@ -373,11 +424,7 @@ export function SettingsDialog({ activeTool = "stt" }: SettingsDialogProps) {
                 <div className="p-3 rounded-xl border border-neutral-800/80 bg-neutral-900/30 text-xs text-neutral-400 flex items-start gap-2">
                   <Wand2 className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
                   <p>
-                    Gemini TTS models act as voice performers! You can use
-                    emotional style tags like{" "}
-                    <code className="text-neutral-200">[whispers]</code> or{" "}
-                    <code className="text-neutral-200">[cheerfully]</code> in
-                    your text to guide delivery.
+                    Gemini TTS models act as voice performers! You can use emotional style tags like <code className="text-neutral-200">[whispers]</code> or <code className="text-neutral-200">[cheerfully]</code> in your text to guide delivery.
                   </p>
                 </div>
               </div>
@@ -388,15 +435,13 @@ export function SettingsDialog({ activeTool = "stt" }: SettingsDialogProps) {
         {/* Footer */}
         <div className="flex items-center justify-between p-4 border-t border-neutral-800 shrink-0 bg-neutral-950">
           <span className="text-xs text-neutral-400">
-            {dialogTab === "stt"
-              ? "Configuring Voice to Text"
-              : "Configuring Text to Speech"}
+            {dialogTab === "stt" ? "Configuring Voice to Text" : "Configuring Text to Speech"}
           </span>
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setIsSettingsOpen(false)}
+              onClick={handleClose}
             >
               Cancel
             </Button>

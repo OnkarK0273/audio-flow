@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { HistoryItem, useTranscribeStore } from "@/store/useTranscribeStore";
 import { Button } from "@/components/ui/button";
+import { sendGAEvent } from "@next/third-parties/google";
 import {
   Check,
   Copy,
@@ -25,12 +26,35 @@ export function TranscriptionHistory() {
   const handleCopy = (item: HistoryItem) => {
     navigator.clipboard.writeText(item.text);
     setCopiedId(item.id);
+    sendGAEvent("event", "stt_history_copied", {
+      item_id: item.id,
+      model: item.model,
+      char_count: item.text.length,
+    });
     setTimeout(() => setCopiedId(null), 1500);
   };
 
   const handleInsert = (item: HistoryItem) => {
     const separator = inputValue && !inputValue.endsWith(" ") ? " " : "";
+    sendGAEvent("event", "stt_history_inserted", {
+      item_id: item.id,
+      char_count: item.text.length,
+    });
     setInputValue(`${inputValue}${separator}${item.text}`.trim());
+  };
+
+  const handleDelete = (item: HistoryItem) => {
+    sendGAEvent("event", "stt_history_deleted", {
+      item_id: item.id,
+    });
+    deleteHistoryItem(item.id);
+  };
+
+  const handleClearAll = () => {
+    sendGAEvent("event", "stt_history_cleared_all", {
+      total_items: history.length,
+    });
+    clearHistory();
   };
 
   const formatTimestamp = (ts: number) => {
@@ -65,7 +89,7 @@ export function TranscriptionHistory() {
 
   return (
     <div className="space-y-3 scrollbar-thin scrollbar-thumb-neutral-700 scrollbar-track-transparent">
-      <div className="flex items-center justify-between px-1 ">
+      <div className="flex items-center justify-between px-1">
         <div className="flex items-center gap-2">
           <History className="h-4 w-4 text-neutral-400" />
           <h3 className="text-sm font-semibold text-neutral-200">
@@ -75,7 +99,7 @@ export function TranscriptionHistory() {
         <Button
           variant="ghost"
           size="sm"
-          onClick={clearHistory}
+          onClick={handleClearAll}
           className="text-xs text-neutral-400 hover:text-red-400 h-7 px-2"
         >
           <Trash2 className="h-3.5 w-3.5 mr-1" />
@@ -132,7 +156,7 @@ export function TranscriptionHistory() {
                 <Button
                   variant="ghost"
                   size="icon-sm"
-                  onClick={() => deleteHistoryItem(item.id)}
+                  onClick={() => handleDelete(item)}
                   title="Delete from history"
                   className="h-7 w-7 text-neutral-400 hover:text-red-400"
                 >

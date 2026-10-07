@@ -5,6 +5,7 @@ import { useTtsStore } from "@/store/useTtsStore";
 import { useTranscribeStore } from "@/store/useTranscribeStore";
 import { AVAILABLE_TTS_MODELS, AVAILABLE_TTS_VOICES } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
+import { sendGAEvent } from "@next/third-parties/google";
 import {
   AlertCircle,
   Loader2,
@@ -45,6 +46,7 @@ export function TtsTool() {
   ];
 
   const handleInsertTag = (tag: string) => {
+    sendGAEvent("event", "tts_expressive_tag_clicked", { tag });
     const textarea = textareaRef.current;
     if (!textarea) {
       setInputText(`${inputText} ${tag} `);
@@ -65,13 +67,48 @@ export function TtsTool() {
     }, 0);
   };
 
+  const handleSamplePromptClick = (prompt: string, idx: number) => {
+    sendGAEvent("event", "tts_sample_prompt_clicked", {
+      prompt_preview: prompt.slice(0, 60),
+      prompt_index: idx,
+    });
+    setInputText(prompt);
+  };
+
+  const handleClear = () => {
+    sendGAEvent("event", "tts_input_cleared", {
+      previous_char_count: inputText.length,
+    });
+    setInputText("");
+  };
+
   const handleGenerate = () => {
     if (!inputText.trim() || isGenerating) return;
     if (!apiKey) {
+      sendGAEvent("event", "tts_generate_blocked_no_api_key", {
+        trigger: "generate_button",
+      });
       setIsSettingsOpen(true);
       return;
     }
+
+    const wordCount = inputText.trim().split(/\s+/).filter(Boolean).length;
+    const hasTags = /\[.*?\]/.test(inputText);
+
+    sendGAEvent("event", "tts_generate_clicked", {
+      model: selectedModel,
+      voice: selectedVoice,
+      char_count: inputText.length,
+      word_count: wordCount,
+      has_expressive_tags: hasTags,
+    });
+
     generateSpeech(apiKey);
+  };
+
+  const handleOpenSettings = (trigger: string) => {
+    sendGAEvent("event", "settings_opened", { trigger });
+    setIsSettingsOpen(true);
   };
 
   const currentModelObj = AVAILABLE_TTS_MODELS.find(
@@ -87,9 +124,8 @@ export function TtsTool() {
       <div className="flex flex-wrap items-center justify-between gap-3 px-1 text-xs">
         <div className="flex items-center gap-2 flex-wrap">
           {/* Model Selector */}
-
           <button
-            onClick={() => setIsSettingsOpen(true)}
+            onClick={() => handleOpenSettings("tts_model_pill")}
             className="group flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-neutral-800 bg-neutral-900/60 hover:border-neutral-700 text-neutral-300 transition-all cursor-pointer"
             title="Click to switch model"
           >
@@ -100,11 +136,10 @@ export function TtsTool() {
           </button>
 
           {/* Voice Selector */}
-
           <button
-            onClick={() => setIsSettingsOpen(true)}
+            onClick={() => handleOpenSettings("tts_voice_pill")}
             className="flex items-center gap-1 px-2.5 py-1 rounded-full border border-neutral-800 bg-neutral-900/60 hover:border-neutral-700 text-neutral-300 transition-all cursor-pointer"
-            title="Click to switch language"
+            title="Click to switch voice"
           >
             <Volume2 className="h-3 w-3 text-emerald-400" />
             <span>
@@ -117,8 +152,8 @@ export function TtsTool() {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => setIsSettingsOpen(true)}
-          className="h-7 px-2.5 text-neutral-400 hover:text-black  rounded-full"
+          onClick={() => handleOpenSettings("tts_settings_button")}
+          className="h-7 px-2.5 text-neutral-400 hover:text-black rounded-full"
         >
           <SlidersHorizontal className="h-3.5 w-3.5 mr-1.5" />
           Settings
@@ -139,7 +174,7 @@ export function TtsTool() {
               type="button"
               onClick={() => handleInsertTag(item.tag)}
               title={`Insert ${item.tag} into text`}
-              className="px-2 py-0.5 rounded-md border border-neutral-800 bg-neutral-900/60 hover:bg-neutral-800 hover:border-neutral-700 text-neutral-300 font-mono text-[10px] transition-colors"
+              className="px-2 py-0.5 rounded-md border border-neutral-800 bg-neutral-900/60 hover:bg-neutral-800 hover:border-neutral-700 text-neutral-300 font-mono text-[10px] transition-colors cursor-pointer"
             >
               {item.tag}
             </button>
@@ -171,7 +206,7 @@ export function TtsTool() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setInputText("")}
+                onClick={handleClear}
                 disabled={isGenerating}
                 className="h-9 px-2.5 text-xs text-neutral-400 hover:text-red-400"
               >
@@ -209,8 +244,8 @@ export function TtsTool() {
           <button
             key={idx}
             type="button"
-            onClick={() => setInputText(prompt)}
-            className="px-2.5 py-1 rounded-lg border border-neutral-800/80 bg-neutral-900/40 hover:bg-neutral-800 hover:text-neutral-200 text-neutral-300 transition-all text-left"
+            onClick={() => handleSamplePromptClick(prompt, idx)}
+            className="px-2.5 py-1 rounded-lg border border-neutral-800/80 bg-neutral-900/40 hover:bg-neutral-800 hover:text-neutral-200 text-neutral-300 transition-all text-left cursor-pointer"
           >
             &ldquo;{prompt.slice(0, 48)}...&rdquo;
           </button>
@@ -227,7 +262,7 @@ export function TtsTool() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setIsSettingsOpen(true)}
+            onClick={() => handleOpenSettings("tts_error_banner")}
             className="h-6 px-2 text-xs text-red-300 hover:text-white hover:bg-red-900/40 ml-2"
           >
             Open Settings

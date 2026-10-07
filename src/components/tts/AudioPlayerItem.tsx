@@ -1,7 +1,9 @@
 "use client";
+
 import React, { useEffect, useRef, useState } from "react";
 import { GeneratedAudioItem, useTtsStore } from "@/store/useTtsStore";
 import { Button } from "@/components/ui/button";
+import { sendGAEvent } from "@next/third-parties/google";
 import {
   Check,
   Copy,
@@ -64,10 +66,20 @@ export function AudioPlayerItem({ item }: AudioPlayerItemProps) {
     if (!audio) return;
 
     if (isPlaying) {
+      sendGAEvent("event", "tts_audio_pause", {
+        audio_id: item.id,
+        current_time: Math.round(audio.currentTime),
+      });
       audio.pause();
       setIsPlaying(false);
       setActivePlayingId(null);
     } else {
+      sendGAEvent("event", "tts_audio_play", {
+        audio_id: item.id,
+        model: item.model,
+        voice: item.voice,
+        duration: Math.round(duration),
+      });
       setActivePlayingId(item.id);
       audio
         .play()
@@ -87,7 +99,27 @@ export function AudioPlayerItem({ item }: AudioPlayerItemProps) {
   const handleCopy = () => {
     navigator.clipboard.writeText(item.text);
     setCopied(true);
+    sendGAEvent("event", "tts_prompt_copied", {
+      audio_id: item.id,
+      char_count: item.text.length,
+    });
     setTimeout(() => setCopied(false), 1500);
+  };
+
+  const handleDownload = () => {
+    sendGAEvent("event", "tts_audio_download", {
+      audio_id: item.id,
+      model: item.model,
+      voice: item.voice,
+      format: "wav",
+    });
+  };
+
+  const handleDelete = () => {
+    sendGAEvent("event", "tts_audio_deleted", {
+      audio_id: item.id,
+    });
+    deleteAudio(item.id);
   };
 
   const formatTime = (secs: number) => {
@@ -96,8 +128,6 @@ export function AudioPlayerItem({ item }: AudioPlayerItemProps) {
     const s = Math.floor(secs % 60);
     return `${m}:${s.toString().padStart(2, "0")}`;
   };
-
-  const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
     <div className="flex flex-col gap-3 p-4 rounded-2xl border border-neutral-800/80 bg-neutral-900/50 hover:border-neutral-700/80 transition-all shadow-md">
@@ -174,6 +204,7 @@ export function AudioPlayerItem({ item }: AudioPlayerItemProps) {
             href={item.audioUrl}
             download={`gemini_tts_${item.voice.toLowerCase()}_${item.id.slice(0, 6)}.wav`}
             title="Download Audio (.wav)"
+            onClick={handleDownload}
             className="flex items-center justify-center h-8 w-8 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors"
           >
             <Download className="h-4 w-4" />
@@ -198,7 +229,7 @@ export function AudioPlayerItem({ item }: AudioPlayerItemProps) {
           <Button
             variant="ghost"
             size="icon-sm"
-            onClick={() => deleteAudio(item.id)}
+            onClick={handleDelete}
             title="Delete audio"
             className="h-8 w-8 text-neutral-400 hover:text-red-400"
           >
