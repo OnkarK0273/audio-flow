@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     siteName: `AudioFlow by ${authorName}`,
     images: [
       {
-        url: "/logo.png",
+        url: "/og-image.png",
         width: 1200,
         height: 630,
         alt: "AudioFlow App Preview",
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     title: "AudioFlow — Speech to Text & TTS Studio",
     description: `Live speech transcription and studio text-to-speech rendering. Built by ${authorName}.`,
     creator: twitterHandle,
-    images: ["/logo.png"],
+    images: ["/og-image.png"],
   },
 };
 
